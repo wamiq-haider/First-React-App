@@ -9,7 +9,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text>stuff.</Text>
-      <TextInput placeholder="Email"/>
+      <TextInput placeholder="Email is happening here"/>
       <ActivityIndicator size={"large"}/>
       <Link href={"/about"}>Go to about screen</Link>
       <Host>
