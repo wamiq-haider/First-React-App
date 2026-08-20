@@ -7,7 +7,10 @@ export default function RootLayout() {
   let isAuth = false;
   useEffect(()=>{
     if (!isAuth){
-      router.replace("/(auth)/login")
+      router.replace("/(auth)/login");
+    }
+    else{
+      router.replace("/(tabs)");
     }
   })
   return <Stack screenOptions={{animation:"ios_from_right", headerShown:false}}>
