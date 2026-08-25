@@ -1,10 +1,35 @@
-import { bold } from "@expo/ui/swift-ui/modifiers";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { View,Text, TextInput, TouchableOpacity,StyleSheet} from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
+
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [isLoading,setIsLoading] = useState(false);
+  const {signIn} = useAuth();
+
   const router = useRouter();
+
+  const handleLogin = async ()=> {
+      if(!email || !password){
+        Alert.alert("Error, please fill in all fields");
+      }
+
+      setIsLoading(true);
+      try{ 
+        await signIn(email,password);
+        router.push("/(tabs)");
+      }
+      catch (error){
+         Alert.alert("Error, Failed to sign in. Please try again.");
+      } finally{
+        setIsLoading(false);
+      }
+    };
+
   return (
     <SafeAreaView edges={["top","bottom"]} style = {styles.container}>
     <View style = {styles.content}>
@@ -16,6 +41,8 @@ export default function LoginScreen() {
         placeholderTextColor={"#999"}
         keyboardType="email-address"
         autoComplete="email"
+         value= {email}
+        onChangeText={setEmail}
         autoCapitalize="none"
         style = {styles.input}
         />
@@ -23,13 +50,17 @@ export default function LoginScreen() {
         placeholder="Password..." 
         placeholderTextColor={"#999"}
         autoComplete="password"
+         value= {password}
+        onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
         style = {styles.input}
         />
 
-        <TouchableOpacity style = {styles.button}>
-          <Text  style = {styles.buttonText} >Sign in</Text>
+        <TouchableOpacity style = {styles.button} onPress={handleLogin}>
+          {isLoading ?
+          (<ActivityIndicator size={24} color={"#fff"}/>) :
+           (<Text style= {styles.buttonText}>Sign in</Text>)}
         </TouchableOpacity>
 
         <TouchableOpacity style = {styles.linkButton} onPress={()=>{

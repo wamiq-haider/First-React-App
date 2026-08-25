@@ -1,14 +1,40 @@
+import { useAuth } from "@/context/AuthContext";
 import { bold } from "@expo/ui/swift-ui/modifiers";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { View,Text, TextInput, TouchableOpacity,StyleSheet} from "react-native";
+import { useEffect, useState } from "react";
+import { View,Text, TextInput, TouchableOpacity,StyleSheet, Alert, ActivityIndicator} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpScreen() {
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [isLoading,setIsLoading] = useState(false);
 
   const router = useRouter();
+  const {signUp} = useAuth();
+  
+  const handleSignUp = async ()=> {
+    if(!email || !password){
+      Alert.alert("Error, please fill in all fields");
+    }
+
+    if(password.length < 8){
+      Alert.alert("Password must be at least 8 characters");
+    }
+
+    setIsLoading(true);
+    try{
+      await signUp(email,password);
+      router.push("/(auth)/onboarding");
+    }
+    catch (error){
+       Alert.alert("Error, Failed to sign up. Please try again.");
+    } finally{
+      setIsLoading(false);
+    }
+  };
+
+  
   return (
     <SafeAreaView edges={["top","bottom"]} style = {styles.container}>
     <View style = {styles.content}>
@@ -36,8 +62,9 @@ export default function SignUpScreen() {
         style = {styles.input}
         />
 
-        <TouchableOpacity style = {styles.button}>
-          <Text  style = {styles.buttonText} >Sign up</Text>
+        <TouchableOpacity style = {styles.button} onPress={handleSignUp}>
+          {isLoading ? (<ActivityIndicator size={24} color="#fff"/>)
+           : (<Text style = {styles.buttonText} >Sign up</Text>)}
         </TouchableOpacity>
 
         <TouchableOpacity style = {styles.linkButton} onPress={()=>{
